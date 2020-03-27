@@ -27,8 +27,8 @@ B = B .* (1 ./ sqrt(sum(B .* B, 1)));
 if exist([output_file 'lasso/'],'dir') == 0
     mkdir([output_file 'lasso/']);
 end
-for i=1:10
-    fprintf(['Test Image ' num2str(i) '\n']);
+for i=1:1
+    t1=clock;
     [w_lasso, lasso_res] = lasso(A,B(:, i));
     %-----------------------------------
     h_fig = figure('Name','Lasso', 'Visible', 'off');
@@ -57,7 +57,23 @@ for i=1:10
     ylabel('classification')
     saveas(h_fig, [output_file 'lasso/score_norm_lasso_' num2str(i) '.png']);
     close(h_fig)
+    t2=clock;
+    fprintf(['Lasso Test Image ' num2str(i) ', time=%.2fs' '\n'], etime(t2,t1));
 end
 %-----------------------------------
 % Pan Wei
 %-----------------------------------
+if exist([output_file 'PanWei/'],'dir') == 0
+    mkdir([output_file 'PanWei/']);
+end
+for i=1:10
+    t1=clock;
+    lambda_max = max(B(:, i)' * A);
+    for ratio = 0:10
+        lambda = lambda_max * ratio / 10;
+        MAXITER = 100;
+        [end_iter_pan, w_pan] =  pan(B(:, i)', A, lambda, MAXITER);
+    end
+    t2=clock;
+    fprintf(['PanWei Test Image ' num2str(i) ', time=%.2fs' '\n'], etime(t2,t1));
+end

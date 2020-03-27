@@ -2,3 +2,6 @@
 __pycache__
 data
 .DS_Store
+*/.DS_Store
+cvx
+cvx-maci64.zip
