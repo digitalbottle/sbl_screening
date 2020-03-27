@@ -57,6 +57,7 @@ function [screen_ratio, end_iter, w_estimate] = pan_revised(Output, Dic, lambda,
         % stopping criterion
         if(iter>1 && abs(max(w_estimate(:,iter)-w_estimate(:,iter-1)))<1e-3)
             w_estimate(:,end)=w_estimate(:,iter-1);
+            w_estimate(w_estimate(:,end) < 1e-6, end) = 0;
             break;
         end
     end
