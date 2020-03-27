@@ -18,17 +18,17 @@ function [screen_ratio, end_iter, w_estimate] = pan_revised(Output, Dic, lambda,
     UU=zeros(n, MAXITER);
     w_estimate=zeros(n, MAXITER);
     WWW=ones(n, MAXITER);
-    fprintf(1, 'Finding a sparse feasible point using l1-norm heuristic ...\n');
+%     fprintf(1, 'Finding a sparse feasible point using l1-norm heuristic ...\n');
     Dic_bak = Dic;
     end_iter = 0;
     for iter=1:1:MAXITER
         end_iter = iter;
-        fprintf('This is round %d \n', iter);
+%         fprintf('This is round %d \n', iter);
         u = U(:,iter);
         [v,lam_max] = screen(Dic,Output,lambda,u); 
         Dic(:,v==1) = [];
         % screening
-        fprintf('screen ratio for round %d = %f%%\n', iter, (1-size(Dic,2)/n )*100);
+%         fprintf('screen ratio for round %d = %f%%\n', iter, (1-size(Dic,2)/n )*100);
         screen_ratio = 1-size(Dic,2)/n;
         % solve the reduced problem
         cvx_begin quiet
@@ -55,11 +55,10 @@ function [screen_ratio, end_iter, w_estimate] = pan_revised(Output, Dic, lambda,
             end
         end        
         % stopping criterion
-       
         if(iter>1 && abs(max(w_estimate(:,iter)-w_estimate(:,iter-1)))<1e-3)
-            w_estimate(:,end)=w_estimate(:,iter);
+            w_estimate(:,end)=w_estimate(:,iter-1);
             break;
         end
     end
-    fprintf('lambda_max=%f\n',lam_max);
+%     fprintf('lambda_max=%f\n',lam_max);
 end

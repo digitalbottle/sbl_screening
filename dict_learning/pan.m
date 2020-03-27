@@ -30,11 +30,11 @@ Gamma=zeros(n, MAXITER);
 UU=zeros(n, MAXITER);
 w_estimate=zeros(n, MAXITER);
 WWW=ones(n, MAXITER);
-fprintf(1, 'Finding a sparse feasible point using l1-norm heuristic ...\n');
+% fprintf(1, 'Finding a sparse feasible point using l1-norm heuristic ...\n');
 end_iter = 0;
 for iter=1:1:MAXITER
     end_iter = iter;
-    fprintf('This is round %d \n', iter);
+    % fprintf('This is round %d \n', iter);
     cvx_begin quiet
     cvx_solver sedumi   %sdpt3
     variable W(n)
@@ -56,10 +56,9 @@ for iter=1:1:MAXITER
             w_estimate(i,iter)=0;
         end
     end
-        % stopping criterion
-    
+    % stopping criterion
     if(iter>1 && abs(max(w_estimate(:,iter)-w_estimate(:,iter-1)))<1e-3)
-        w_estimate(:,end)=w_estimate(:,iter);
+        w_estimate(:,end)=w_estimate(:,iter-1);
         break;
     end
 end

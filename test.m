@@ -18,20 +18,20 @@ A = A .* (1 ./ sqrt(sum(A .* A, 1)));
 % [w_ls, ~, MSE_ls] = lscov(A,y);
 %-----------------------------------
 %% Lasso
-fprintf("Solving Lasso\n");
-%-----------------------------------
-[w_lasso, lasso_res] = lasso(A,y);
-%-----------------------------------
-figure('Name','Lasso');
-subplot(3,1,1);
-plot(lasso_res.DF, 'LineWidth',2);
-title('non-zero parameter number')
-subplot(3,1,2);
-plot(lasso_res.Lambda, 'LineWidth',2);
-title('Lambda')
-subplot(3,1,3);
-plot(lasso_res.MSE, 'LineWidth',2);
-title('MSE')
+% fprintf("Solving Lasso\n");
+% %-----------------------------------
+% [w_lasso, lasso_res] = lasso(A,y);
+% %-----------------------------------
+% figure('Name','Lasso');
+% subplot(3,1,1);
+% plot(lasso_res.DF, 'LineWidth',2);
+% title('non-zero parameter number')
+% subplot(3,1,2);
+% plot(lasso_res.Lambda, 'LineWidth',2);
+% title('Lambda')
+% subplot(3,1,3);
+% plot(lasso_res.MSE, 'LineWidth',2);
+% title('MSE')
 %% pan method
 lambda_max = max(y' * A);
 ratio = 0.7;
