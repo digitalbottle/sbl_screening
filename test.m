@@ -15,7 +15,7 @@ y = y / sqrt(sum(y .* y));
 A = A .* (1 ./ sqrt(sum(A .* A, 1)));
 %% ordinary least squares solution
 %-----------------------------------
-[w_ls, ~, MSE_ls] = lscov(A,y);
+% [w_ls, ~, MSE_ls] = lscov(A,y);
 %-----------------------------------
 %% Lasso
 fprintf("Solving Lasso\n");
