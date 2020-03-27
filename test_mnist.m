@@ -1,5 +1,9 @@
 clc;clear;
 addpath(genpath('.'));
+output_file = './data/result';
+if exist(output_file,'dir') == 0
+    mkdir(output_file);
+end
 %% Load dataset
 train_image = loadMNISTImages('./data/mnist/train-images-idx3-ubyte');
 train_label = loadMNISTLabels('./data/mnist/train-labels-idx1-ubyte');
@@ -34,5 +38,7 @@ title('Lambda')
 subplot(3,1,3);
 plot(lasso_res.MSE, 'LineWidth',2);
 title('MSE')
-
+saveas(gcf, [output_file '/Lasso.png']);
+close(gcf)
+close 
 %% Borda Count
