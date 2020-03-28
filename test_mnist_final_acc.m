@@ -10,9 +10,10 @@ train_label_base = loadMNISTLabels('./data/mnist/train-labels-idx1-ubyte');
 test_image_base = loadMNISTImages('./data/mnist/t10k-images-idx3-ubyte');
 test_label_base = loadMNISTLabels('./data/mnist/t10k-labels-idx1-ubyte');
 %% Accuracy -- lambda / lambda_max
-exp_time = 3;
-lambda_num = 15;
-dict_set_num = 100;
+exp_time = 10;
+lambda_num = 10;
+lambda_ratios = linspace(0.1, 0.9, lambda_num);
+dict_set_num = 1000;
 test_set_num = 100;
 % record
 lasso_acc = zeros(exp_time, lambda_num);
@@ -44,10 +45,12 @@ for exp_t=1:exp_time
     %-----------------------------------
     lasso_result = zeros(size(test_image, 2), lambda_num);
     t1=clock;
-    for i=1:size(test_image, 2)
-        [w_lasso, lasso_res] = lasso(A, B(:, i), 'NumLambda', lambda_num+1);
+    parfor i=1:size(test_image, 2)
+        [~, lasso_res] = lasso(A, B(:, i), 'NumLambda', lambda_num+1);
+        lambda_max = lasso_res.Lambda(end-1);
+        [w_lasso, lasso_res] = lasso(A, B(:, i), 'Lambda', lambda_ratios * lambda_max);
         %% Correlation classification
-        score = Correlation(w_lasso(:,1:end-1), train_label);
+        score = Correlation(w_lasso(:,1:end), train_label);
         [~, argmax] = max(score, [], 1);
         lasso_result(i, :) = argmax - 1;
     end
@@ -55,16 +58,48 @@ for exp_t=1:exp_time
     lasso_acc(exp_t, :) = sum(lasso_result == test_label, 1) ./ size(test_image, 2);
     fprintf('Lasso Test Exp %d/%d, time=%.2fs, acc=%.2f\n', ...
                  exp_t, exp_time, etime(t2,t1), mean(lasso_acc(exp_t, :)));
+    %-----------------------------------
+    % Pan Wei
+    %-----------------------------------
+    Pan_result = zeros(size(test_image, 2), lambda_num);
+    t1=clock;
+    parfor i=1:size(test_image, 2)
+        lambda_max = max(B(:, i)' * A);
+        w_pan = zeros(size(A, 2), lambda_num);
+        lambda = lambda_max * lambda_ratios;
+        for ratio = 1:lambda_num
+            fprintf('Pan Test Exp ratio %d/%d, img %d/%d exp %d/%d\n', ...
+                           ratio, lambda_num, i, size(test_image, 2), exp_t, exp_time);
+            MAXITER = 100;
+            % [end_iter_pan, w_pan_iter] =  pan(B(:, i), A, lambda(ratio), MAXITER);
+            [~, end_iter_pan_re, w_screen] = pan_revised(B(:, i), A, lambda(ratio), MAXITER);
+            w_pan(:, ratio) = w_screen(:, end);
+        end
+        %% Correlation classification
+        score = Correlation(w_pan(:,1:end), train_label);
+        [~, argmax] = max(score, [], 1);
+        Pan_result(i, :) = argmax - 1;
+    end
+    t2=clock;
+    Pan_acc(exp_t, :) = sum(Pan_result == test_label, 1) ./ size(test_image, 2);
+    fprintf('Pan Test Exp %d/%d, time=%.2fs, acc=%.2f\n', ...
+                 exp_t, exp_time, etime(t2,t1), mean(Pan_acc(exp_t, :)));
 end
-lambda_ratios = linspace(0.01, 0.99, size(lasso_acc, 2));
+
 h_fig = figure('Name', 'Accuracy', 'Visible', 'off');
+hold on
 lasso_acc_mean = mean(lasso_acc, 1);
 lasso_acc_std = std(lasso_acc, 1, 1);
 errorbar(lambda_ratios, lasso_acc_mean, lasso_acc_std, '-s', 'LineWidth', 2, 'Color', 'r', ...
                   'MarkerSize',10, 'MarkerEdgeColor','r','MarkerFaceColor','w')
+Pan_acc_mean = mean(Pan_acc, 1);
+Pan_acc_std = std(Pan_acc, 1, 1);
+errorbar(lambda_ratios, Pan_acc_mean, Pan_acc_std, '-s', 'LineWidth', 2, 'Color', 'g', ...
+                  'MarkerSize',10, 'MarkerEdgeColor','g','MarkerFaceColor','w')
+
 title('Accuracy -- \lambda / \lambda_{max}')
 xlabel('\lambda / \lambda_{max}')
 ylabel('Accuracy')
-legend('Lasso');
+legend('Lasso', 'Pan Wei Screen Test');
 saveas(h_fig, [output_file 'Accuracy.png']);
 close(h_fig)
