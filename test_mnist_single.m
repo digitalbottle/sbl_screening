@@ -12,8 +12,8 @@ test_label = loadMNISTLabels('./data/mnist/t10k-labels-idx1-ubyte');
 %------------------------
 train_image = train_image(:, 1:1000);
 train_label = train_label(1:1000);
-test_image = test_image(:, 1:3);
-test_label = test_label(1:3);
+test_image = test_image(:, 5:5);
+test_label = test_label(5:5);
 %% Sparse representation: test data [i] = Sparse_representation * train data
 % dict
 dict_img = train_image(:,:);
@@ -31,7 +31,7 @@ if exist([output_file 'lasso/'],'dir') == 0
 end
 for i=1:size(test_image, 2)
     t1=clock;
-    [w_lasso, lasso_res] = lasso(A, B(:, i));
+    [w_lasso, lasso_res] = lasso(A, B(:, i), 'NumLambda', 11);
     %-----------------------------------
     h_fig = figure('Name','Lasso', 'Visible', 'off');
     subplot(3,1,1);

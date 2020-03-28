@@ -18,3 +18,6 @@
 
 ![score_norm_PanWeiRevised_2](./doc/score_norm_PanWeiRevised_2.png)
 
+#### Accuracy
+
+![Accuracy](./doc/Accuracy.png)
