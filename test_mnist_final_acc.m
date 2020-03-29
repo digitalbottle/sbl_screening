@@ -40,24 +40,24 @@ for exp_t=1:exp_time
     % target
     B = test_image;
     B = B .* (1 ./ sqrt(sum(B .* B, 1)));
-    %-----------------------------------
-    % Lasso
-    %-----------------------------------
-    lasso_result = zeros(size(test_image, 2), lambda_num);
-    t1=clock;
-    parfor i=1:size(test_image, 2)
-        [~, lasso_res] = lasso(A, B(:, i), 'NumLambda', lambda_num+1);
-        lambda_max = lasso_res.Lambda(end-1);
-        [w_lasso, lasso_res] = lasso(A, B(:, i), 'Lambda', lambda_ratios * lambda_max);
-        %% Correlation classification
-        score = Correlation(w_lasso(:,1:end), train_label);
-        [~, argmax] = max(score, [], 1);
-        lasso_result(i, :) = argmax - 1;
-    end
-    t2=clock;
-    lasso_acc(exp_t, :) = sum(lasso_result == test_label, 1) ./ size(test_image, 2);
-    fprintf('Lasso Test Exp %d/%d, time=%.2fs, acc=%.2f\n', ...
-                 exp_t, exp_time, etime(t2,t1), mean(lasso_acc(exp_t, :)));
+%     %-----------------------------------
+%     % Lasso
+%     %-----------------------------------
+%     lasso_result = zeros(size(test_image, 2), lambda_num);
+%     t1=clock;
+%     parfor i=1:size(test_image, 2)
+%         [~, lasso_res] = lasso(A, B(:, i), 'NumLambda', lambda_num+1);
+%         lambda_max = lasso_res.Lambda(end-1);
+%         [w_lasso, lasso_res] = lasso(A, B(:, i), 'Lambda', lambda_ratios * lambda_max);
+%         %% Correlation classification
+%         score = Correlation(w_lasso(:,1:end), train_label);
+%         [~, argmax] = max(score, [], 1);
+%         lasso_result(i, :) = argmax - 1;
+%     end
+%     t2=clock;
+%     lasso_acc(exp_t, :) = sum(lasso_result == test_label, 1) ./ size(test_image, 2);
+%     fprintf('Lasso Test Exp %d/%d, time=%.2fs, acc=%.2f\n', ...
+%                  exp_t, exp_time, etime(t2,t1), mean(lasso_acc(exp_t, :)));
     %-----------------------------------
     % Pan Wei
     %-----------------------------------
@@ -87,11 +87,11 @@ for exp_t=1:exp_time
 end
 
 h_fig = figure('Name', 'Accuracy', 'Visible', 'off');
-hold on
-lasso_acc_mean = mean(lasso_acc, 1);
-lasso_acc_std = std(lasso_acc, 1, 1);
-errorbar(lambda_ratios, lasso_acc_mean, lasso_acc_std, '-s', 'LineWidth', 2, 'Color', 'r', ...
-                  'MarkerSize',10, 'MarkerEdgeColor','r','MarkerFaceColor','w')
+% hold on
+% lasso_acc_mean = mean(lasso_acc, 1);
+% lasso_acc_std = std(lasso_acc, 1, 1);
+% errorbar(lambda_ratios, lasso_acc_mean, lasso_acc_std, '-s', 'LineWidth', 2, 'Color', 'r', ...
+%                   'MarkerSize',10, 'MarkerEdgeColor','r','MarkerFaceColor','w')
 Pan_acc_mean = mean(Pan_acc, 1);
 Pan_acc_std = std(Pan_acc, 1, 1);
 errorbar(lambda_ratios, Pan_acc_mean, Pan_acc_std, '-s', 'LineWidth', 2, 'Color', 'g', ...
@@ -100,6 +100,6 @@ errorbar(lambda_ratios, Pan_acc_mean, Pan_acc_std, '-s', 'LineWidth', 2, 'Color'
 title('Accuracy -- \lambda / \lambda_{max}')
 xlabel('\lambda / \lambda_{max}')
 ylabel('Accuracy')
-legend('Lasso', 'Pan Wei Screen Test');
+% legend('Lasso', 'Pan Wei Screen Test');
 saveas(h_fig, [output_file 'Accuracy.png']);
 close(h_fig)
