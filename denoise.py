@@ -9,7 +9,6 @@ for gpu in gpus:
 
 import sparse_lasso.sparse_linear_regression as slr
 import sparse_lasso.lasso as sla
-import cv2
 import utils.normalize
 
 
@@ -23,6 +22,7 @@ target_size = np.asarray(target_h5["target_num"])
 target_list = []
 target_point_list = []
 
+pdb.set_trace()
 for i in range(target_size):
   target_list.append(np.asarray(target_h5["targets_%02d"%i]))
   target_point_list.append(np.asarray(target_h5["point_%02d"%i]))

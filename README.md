@@ -24,9 +24,17 @@
 
 ## Denoise
 
+#### Generate simulation data
+
+```
+cd sampling
+python simulation_dataset.py
+cd ..
+```
+
 #### Run
 
 ```
-cd 
+python denoise.py
 ```
 
