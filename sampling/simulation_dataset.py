@@ -129,7 +129,7 @@ if __name__ == '__main__':
   target_file = "../data/simulate_target/"
   safe_mkdir(target_file)
   target_list = []
-  target_h5 = h5py.File(os.path.join(target_file, "../simulate.h5"), 'w')
+  target_h5 = h5py.File(os.path.join(target_file, "../target.h5"), 'w')
   target_h5["target_num"] = target_size
   for i in range(target_size):
     I_3d, I_3d_noise, points = simulation_data_generator(meshgrid=[xx, yy],

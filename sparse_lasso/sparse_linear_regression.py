@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import pdb
 from time import time
-import utils.normalize
+import sampling.normalize
 import os
 import cv2
 
@@ -30,9 +30,9 @@ def pan_regression(lambda_pan, taregt_norm, dictionary_norm,dict_list, point_lis
   # ---------------------------------
   def draw_reconstruction(weights, bg, file_path_rec, file_path_pt):
     gt = np.reshape(taregt_norm, dict_list.shape[1:])
-    gt_norm = np.uint8(utils.normalize.std_Normalize(gt) * 255)
+    gt_norm = np.uint8(sampling.normalize.std_Normalize(gt) * 255)
     reconstruction = tf.reshape(tf.linalg.matmul(dictionary_norm, weights) + bg, dict_list.shape[1:])
-    reconstruction_norm = np.uint8(utils.normalize.std_Normalize(reconstruction.numpy()) * 255)
+    reconstruction_norm = np.uint8(sampling.normalize.std_Normalize(reconstruction.numpy()) * 255)
     gt_new = cv2.cvtColor(cv2.resize(gt_norm, (1024, 1024), interpolation = cv2.INTER_AREA), cv2.COLOR_GRAY2RGB)
     img_new = cv2.cvtColor(cv2.resize(reconstruction_norm, (1024, 1024), interpolation = cv2.INTER_AREA), cv2.COLOR_GRAY2RGB)
     # draw pred points

@@ -9,8 +9,6 @@ for gpu in gpus:
 
 import sparse_lasso.sparse_linear_regression as slr
 import sparse_lasso.lasso as sla
-import utils.normalize
-
 
 
 dict_h5 = h5py.File("./data/dictionary.h5", 'r')
