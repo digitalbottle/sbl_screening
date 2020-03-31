@@ -5,15 +5,16 @@ from time import time
 import sampling.normalize
 import os
 import cv2
-
+from skimage.io import imread
+from skimage.io import imsave
 
 
 
 # @tf.function
-def pan_regression(lambda_pan, taregt_norm, dictionary_norm,dict_list, point_list, gt_list):
+def pan_regression(lambda_pan, taregt_norm, dictionary_norm,dict_list, point_list, gt_list, save_path):
   delta = tf.constant(1e-6)
   MAXITER = tf.constant(100)
-  result_path = "./result/%.8f"%lambda_pan
+  result_path = os.path.join(save_path, "%.8f"%lambda_pan)
   if not os.path.isdir(result_path):
     os.makedirs(os.path.join(result_path, "pan"))
     os.makedirs(os.path.join(result_path, "pan_gt"))
@@ -53,8 +54,9 @@ def pan_regression(lambda_pan, taregt_norm, dictionary_norm,dict_list, point_lis
       r = int(round(0.05 * ratio * theta[2]))
       gt_new = cv2.rectangle(gt_new, (int(round(pointx + dx)) - r, int(round(pointy + dy)) - r), (int(round(pointx + dx)) + r, int(round(pointy + dy)) + r), (0, 255, 0), 2)
     
-    cv2.imwrite(file_path_rec, img_new)
-    cv2.imwrite(file_path_pt, gt_new)
+    imsave(file_path_rec, img_new)
+    imsave(file_path_pt, gt_new)
+    print("save tiff :%s, %s"%(file_path_rec, file_path_pt))
     return
   
   # ---------------------------------
@@ -89,11 +91,12 @@ def pan_regression(lambda_pan, taregt_norm, dictionary_norm,dict_list, point_lis
     # TODO sparse Tensor
     U_iter = U_next
     # ---------------------------------
-    # Lasso meta learning
+    # Lasso PanWei learning
     # ---------------------------------
     w_iter.assign(tf.random.uniform([dictionary_norm.shape[1], 1]))
     bg.assign(tf.random.uniform([1]) - 0.5)
-    w_estimate, bg_estimate, loss, grad, mse = meta(lambda_pan, U_iter, dictionary_norm, taregt_norm, w_iter, bg)
+    PanWei_learning = PanWei(taregt_norm)
+    w_estimate, bg_estimate, loss, grad, mse = PanWei_learning(lambda_pan, U_iter, dictionary_norm, taregt_norm, w_iter, bg)
     print("N", tf.reduce_sum(tf.cast(w_iter > 0, dtype=tf.int32)).numpy(), \
           "Min_w", tf.reduce_min(w_iter).numpy(), "Max_w", tf.reduce_max(w_iter).numpy(), \
           "Loss", loss.numpy(), "grad", tf.norm(grad[0], ord=1).numpy(), \
@@ -109,7 +112,7 @@ def pan_regression(lambda_pan, taregt_norm, dictionary_norm,dict_list, point_lis
     U_next = tf.reshape(tf.abs(tf.sqrt(UU)), [n, 1])
     w_estimate = w_estimate * tf.where((w_estimate ** 2 /  tf.norm(w_estimate, ord=2) ** 2) < delta, tf.zeros(tf.shape(w_estimate)), tf.ones(tf.shape(w_estimate)))
     print("N_w:", tf.reduce_sum(tf.cast(w_estimate > 0, dtype=tf.int32)).numpy())
-    draw_reconstruction(w_estimate.numpy(), bg_estimate.numpy(), os.path.join(result_path, "pan/%03d.png"%i), os.path.join(result_path, "pan_gt/%03d.png"%i))
+    draw_reconstruction(w_estimate.numpy(), bg_estimate.numpy(), os.path.join(result_path, "pan/%03d.tif"%i), os.path.join(result_path, "pan_gt/%03d.tif"%i))
     # ---------------------------------
     # stopping criterion
     # ---------------------------------
@@ -120,17 +123,17 @@ def pan_regression(lambda_pan, taregt_norm, dictionary_norm,dict_list, point_lis
   return w_estimate, bg_estimate
 
 # ---------------------------------
-# Lasso meta learning
+# Lasso PanWei learning
 # ---------------------------------
-def meta(lambda_pan, U_iter, dictionary_norm, taregt_norm, w_iter, bg):
+def PanWei(taregt_norm):
   # Lasso
   lasso_delta = tf.constant(0.00)
   optimizer = tf.keras.optimizers.Adam(lr=0.1)
   max_iter = tf.constant(10000)
   grad_bound = tf.constant(1e-4)
   target = tf.reduce_mean(tf.square(taregt_norm))
-  @tf.function
-  def meta_learning(lambda_pan, U_iter, dictionary_norm, taregt_norm, w_iter, bg):
+  # @tf.function
+  def PanWei_learning(lambda_pan, U_iter, dictionary_norm, taregt_norm, w_iter, bg):
     def train_step():
       with tf.GradientTape() as tape:
         loss = 0.5 * tf.reduce_mean(tf.square(tf.linalg.matmul(dictionary_norm, w_iter) + bg - taregt_norm)) + \
@@ -158,4 +161,6 @@ def meta(lambda_pan, U_iter, dictionary_norm, taregt_norm, w_iter, bg):
     else:
       print("fail")
     return w_iter, bg, loss, grad, mse
-  return meta_learning(lambda_pan, U_iter, dictionary_norm, taregt_norm, w_iter, bg)
+  # w_estimate, bg_estimate, loss, grad, mse = \
+  #   PanWei_learning(lambda_pan, U_iter, dictionary_norm, taregt_norm, w_iter, bg)
+  return PanWei_learning

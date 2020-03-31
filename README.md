@@ -22,7 +22,7 @@
 
 ![Accuracy](./doc/Accuracy.png)
 
-## Denoise
+## Reconstruction
 
 #### Generate simulation data
 
@@ -35,6 +35,11 @@ cd ..
 #### Run
 
 ```
-python denoise.py
+python reconstruction.py
 ```
 
+#### Denoise
+
+
+
+#### Parameter Estimation
