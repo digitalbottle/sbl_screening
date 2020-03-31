@@ -21,3 +21,12 @@
 #### Accuracy
 
 ![Accuracy](./doc/Accuracy.png)
+
+## Denoise
+
+#### Run
+
+```
+cd 
+```
+
