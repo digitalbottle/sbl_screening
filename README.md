@@ -35,7 +35,7 @@ cd ..
 #### Run
 
 ```
-python reconstruction.py
+matlab reconstruction.m
 ```
 
 #### Denoise

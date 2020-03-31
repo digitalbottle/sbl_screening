@@ -1,5 +1,4 @@
 clc;clear;
-addpath(genpath('.'));
 output_file = './data/result/';
 if exist(output_file,'dir') == 0
     mkdir(output_file);

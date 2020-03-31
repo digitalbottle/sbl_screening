@@ -15,8 +15,8 @@ from skimage.io import imsave
 
 pic_size = [28, 28]
 point_number = 10
-target_size = 5
-
+target_size = 200
+dict_size = 2000
 def point_spread_function_2d(p, meshgrid):
   X, Y = meshgrid
   x0 = p[0]
@@ -38,7 +38,7 @@ def prior_transform_2d_dict(uniform_sample):
   '''
   priors_list = [priors.TopHat(mini=0.8, maxi=1.2),
                  priors.TopHat(mini=pic_size[0]*0.1, maxi=pic_size[0]*0.9), 
-                 priors.TopHat(mini=pic_size[1]*0.1, maxi=pic_size[1]*0.7),
+                 priors.TopHat(mini=pic_size[1]*0.1, maxi=pic_size[1]*0.9),
                  priors.TopHat(mini=2, maxi=4)]
   if len(uniform_sample) != (len(priors_list)):
     print(len(uniform_sample), len(priors_list))
@@ -58,8 +58,8 @@ def prior_transform_2d_target(uniform_sample):
     sigmaxy = theta[3]
   '''
   priors_list = [priors.TopHat(mini=0.8, maxi=1.2),
-                 priors.TopHat(mini=pic_size[0]*0.3, maxi=pic_size[0]*0.7), 
-                 priors.TopHat(mini=pic_size[1]*0.3, maxi=pic_size[1]*0.7),
+                 priors.TopHat(mini=pic_size[0]*0.2, maxi=pic_size[0]*0.8), 
+                 priors.TopHat(mini=pic_size[1]*0.2, maxi=pic_size[1]*0.8),
                  priors.TopHat(mini=2, maxi=4)]
   if len(uniform_sample) != (len(priors_list)):
     print(len(uniform_sample), len(priors_list))
@@ -106,7 +106,7 @@ if __name__ == '__main__':
   ''' Dictionary '''
   dict_file = "../data/simulate_dict/"
   safe_mkdir(dict_file)
-  dict_size = 1000
+
   dict_list = []
   point_list = []
   dict_h5 = h5py.File(os.path.join(dict_file, "../dictionary.h5"), 'w')
