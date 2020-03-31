@@ -5,8 +5,8 @@ para_es_file = './data/result/reconstruction/para_es/';
 %% prepare dataset
 [dict_img, dict_pt, target_imgs, clean_imgs, target_pts] = load_data('./data');
 dict_set_num = 1000;
-test_set_num = 100;
-lambda_num = 10;
+test_set_num = 2;
+lambda_num = 3;
 lambda_ratios = linspace(0.1, 0.9, lambda_num);
 %-----------------------------------
 dict_img_flatten = dict_img(:, :)';
@@ -14,6 +14,8 @@ train_num_list = randperm(size(dict_img, 1), dict_set_num);
 test_num_list = randperm(size(target_imgs, 1), test_set_num);
 %-----------------------------------
 dict_set = dict_img_flatten(:, train_num_list);
+dict_pt_set = dict_pt(train_num_list);
+
 clean_set = clean_imgs(test_num_list);
 target_set = target_imgs(test_num_list);
 %% Record
@@ -76,7 +78,8 @@ for i=1:test_set_num
         denoise_acc(i, ratio) = 1 - sum((Denoise_img_flatten - C) .^ 2) / sum(C .^ 2);
         %-----------------------------------
         % Parameter Estimation
-        %----------------------------------- 
+        %-----------------------------------
+        
     end
     
 end

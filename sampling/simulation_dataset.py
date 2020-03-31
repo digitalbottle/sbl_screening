@@ -14,7 +14,7 @@ from skimage.io import imsave
 
 
 pic_size = [28, 28]
-point_number = 10
+point_number = 4
 target_size = 200
 dict_size = 2000
 def point_spread_function_2d(p, meshgrid):
