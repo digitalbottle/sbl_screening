@@ -112,7 +112,7 @@ for i=1:test_set_num
             mkdir(output_file);
         end
         output = [output_file '/' num2str(ratio) '.png'];
-        imwrite(Denoise_img, output);
+        imwrite(Denoise_img_norm, output);
         Wavelet_denoise_acc(i, ratio) = 1 - sum(sum((Denoise_img - clean_img) .^ 2)) / sum(sum(clean_img .^ 2));
         Wavelet_psnr_acc(i, ratio) = getPSNR(Denoise_img, clean_img);
         Wavelet_ssim_acc(i, ratio) = getMSSIM(Denoise_img, clean_img);
