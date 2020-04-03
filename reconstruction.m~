@@ -5,10 +5,9 @@ para_es_file = './data/result/reconstruction/para_es/';
 %% prepare dataset
 [dict_img, dict_pt, target_imgs, clean_imgs, target_pts] = load_data('./data');
 dict_set_num = 1000;
-test_set_num = 1;
+test_set_num = 2;
 lambda_num = 3;
-lambda_ratios = linspace(0.01, 0.03, lambda_num);
-Wavelet_ratios = linspace(1, 3, lambda_num);
+lambda_ratios = linspace(0.01, 0.3, lambda_num);
 %-----------------------------------
 dict_img_flatten = dict_img(:, :)';
 train_num_list = randperm(size(dict_img, 1), dict_set_num);
@@ -22,9 +21,7 @@ target_set = target_imgs(test_num_list);
 %% Record
 denoise_acc = zeros(test_set_num, lambda_num);
 psnr_acc = zeros(test_set_num, lambda_num);
-ssim_acc = zeros(test_set_num, lambda_num);
-% Wavelet
-
+ssim
 %% main loop
 for i=1:test_set_num
     clean_img = clean_set{i};
@@ -81,27 +78,25 @@ for i=1:test_set_num
         imwrite(Denoise_img_norm, output);
         % denoise acc
         denoise_acc(i, ratio) = 1 - sum((Denoise_img_flatten - C) .^ 2) / sum(C .^ 2);
-        psnr_acc(i, ratio) = getPSNR(Denoise_img, clean_img);
-        ssim_acc(i, ratio) = getMSSIM(Denoise_img, clean_img);
+        %-----------------------------------
+        % Parameter Estimation
+        %-----------------------------------
+        
     end
-    %-----------------------------------
-    % Wavelet signal denoising result
-    %-----------------------------------
-%     Denoise_img = wdenoise(target_img, 2,'Wavelet','sym4');
-%     getPSNR(Denoise_img, clean_img);
+    
 end
 %-----------------------------------
 % Show acc
 %-----------------------------------
-draw_denoise([denoise_file 'Accuracy.png'], ...
-   lambda_ratios, denoise_acc, '\lambda / \lambda_{max}', 'Accuracy');
-%-----------------------------------
-% Show PSNR
-%-----------------------------------
-draw_denoise([denoise_file 'PSNR.png'], ...
-   lambda_ratios, psnr_acc, '\lambda / \lambda_{max}', 'PSNR');
-%-----------------------------------
-% Show SSIM
-%-----------------------------------
-draw_denoise([denoise_file 'SSIM.png'], ...
-   lambda_ratios, ssim_acc, '\lambda / \lambda_{max}', 'SSIM');
+h_fig = figure('Name', 'Accuracy', 'Visible', 'off');
+Pan_acc_mean = mean(denoise_acc, 1);
+Pan_acc_std = std(denoise_acc, 1, 1);
+errorbar(lambda_ratios, Pan_acc_mean, Pan_acc_std, '-s', 'LineWidth', 2, 'Color', 'b', ...
+                  'MarkerSize',10, 'MarkerEdgeColor','b','MarkerFaceColor','w')
+
+title('Accuracy -- \lambda / \lambda_{max}')
+xlabel('\lambda / \lambda_{max}')
+ylabel('Accuracy')
+% legend('Lasso', 'Pan Wei Screen Test');
+saveas(h_fig, [output_file 'Accuracy.png']);
+close(h_fig)
