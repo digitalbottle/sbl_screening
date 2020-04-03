@@ -16,7 +16,7 @@ from skimage.io import imsave
 pic_size = [28, 28]
 point_number = 4
 target_size = 200
-dict_size = 2000
+dict_size = 3000
 def point_spread_function_2d(p, meshgrid):
   X, Y = meshgrid
   x0 = p[0]
@@ -136,7 +136,7 @@ if __name__ == '__main__':
                                   psf=point_spread_function_2d, 
                                   theta_length=4, 
                                   prior_transform=prior_transform_2d_target,
-                                  noise_sigma=0.1,
+                                  noise_sigma=0.5,
                                   background=0.01,
                                   point_num=point_number)
     # No noise
