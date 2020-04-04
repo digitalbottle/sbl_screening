@@ -10,7 +10,7 @@ end
 dict_set_num = 1000;
 test_set_num = 10;
 lambda_num = 10;
-lambda_ratios = linspace(0.01, 0.09, lambda_num);
+lambda_ratios = linspace(0.01, 0.3, lambda_num);
 nms_overlap = 0.5;
 %-----------------------------------
 dict_img_flatten = dict_img(:, :)';
@@ -78,7 +78,7 @@ parfor i=1:test_set_num
             mkdir(output_file);
         end
         % detection result
-        result_pt = dict_pt_set(abs(w_pan(:, ratio)) > (0.1*max(w_pan(:, ratio))), :);
+        result_pt = dict_pt_set(abs(w_pan(:, ratio)) > (0.01*max(w_pan(:, ratio))), :);
         %% NMS
         x = result_pt(:, 1);
         y = result_pt(:, 2);
@@ -89,7 +89,7 @@ parfor i=1:test_set_num
         nms_bbox(:, 2) = y-h/2+0.5;
         nms_bbox(:, 3) = x+w/2+0.5;
         nms_bbox(:, 4) = y+h/2+0.5;
-        nms_bbox(:, 5) = w_pan(abs(w_pan(:, ratio)) > (0.1*max(w_pan(:, ratio))), ratio);
+        nms_bbox(:, 5) = w_pan(abs(w_pan(:, ratio)) > (0.01*max(w_pan(:, ratio))), ratio);
         top_bbox = nms(nms_bbox, nms_overlap);
         result_pt_nms = zeros(size(top_bbox, 1), 3);
         result_pt_nms(:, 1) = (top_bbox(:, 1) + top_bbox(:, 3) - 1) ./ 2;
