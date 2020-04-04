@@ -94,7 +94,7 @@ h_fig = figure('Name', 'Accuracy', 'Visible', 'off');
 %                   'MarkerSize',10, 'MarkerEdgeColor','r','MarkerFaceColor','w')
 Pan_acc_mean = mean(Pan_acc, 1);
 Pan_acc_std = std(Pan_acc, 1, 1);
-errorbar(lambda_ratios, Pan_acc_mean, Pan_acc_std, '-s', 'LineWidth', 2, 'Color', 'g', ...
+errorbar(lambda_ratios, Pan_acc_mean, Pan_acc_std, '-s', 'LineWidth', 2, 'Color', 'b', ...
                   'MarkerSize',10, 'MarkerEdgeColor','g','MarkerFaceColor','w')
 
 title('Accuracy -- \lambda / \lambda_{max}')

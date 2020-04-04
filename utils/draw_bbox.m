@@ -10,7 +10,7 @@ function draw_bbox(output_file, image, gt, bbox, enlarge)
         w = gt(i, 3);
         h = gt(i, 3);
         rectangle('Position', enlarge * [x-w/2+0.5 y-h/2+0.5 w h], ...
-                         'EdgeColor','r', 'Curvature',[1 1], 'LineWidth',2);
+                         'EdgeColor', [0.9, 0.5, 0.5], 'Curvature',[1 1], 'LineWidth',2);
     end
     for i=1:size(bbox, 1)
         x = bbox(i, 1);
@@ -18,7 +18,7 @@ function draw_bbox(output_file, image, gt, bbox, enlarge)
         w = bbox(i, 3);
         h = bbox(i, 3);
         rectangle('Position', enlarge * [x-w/2+0.5 y-h/2+0.5 w h], ...
-                         'EdgeColor','b', 'Curvature',[1 1], 'LineWidth',2);
+                         'EdgeColor', [0.5, 0.5, 0.9], 'LineWidth',2);
     end
     saveas(h_fig, output_file);
 end

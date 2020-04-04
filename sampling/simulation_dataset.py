@@ -12,13 +12,17 @@ from normalize import std_Normalize, l2_Normalize
 from skimage.io import imread
 from skimage.io import imsave
 
-
+noise_sigma = 0.1
 pic_size = [28, 28]
 def point_number():
   n = np.random.randint(2, 5)
   return n
 target_size = 200
 dict_size = 3000
+
+
+
+
 def point_spread_function_2d(p, meshgrid):
   X, Y = meshgrid
   x0 = p[0]
@@ -140,7 +144,7 @@ if __name__ == '__main__':
                                   psf=point_spread_function_2d, 
                                   theta_length=4, 
                                   prior_transform=prior_transform_2d_target,
-                                  noise_sigma=0.5,
+                                  noise_sigma=noise_sigma,
                                   background=0.01,
                                   point_num=point_number())
     # No noise

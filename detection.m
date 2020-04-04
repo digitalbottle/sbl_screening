@@ -10,7 +10,8 @@ end
 dict_set_num = 1000;
 test_set_num = 10;
 lambda_num = 10;
-lambda_ratios = linspace(0.0, 1.0, lambda_num);
+lambda_ratios = linspace(0.01, 0.09, lambda_num);
+nms_overlap = 0.5;
 %-----------------------------------
 dict_img_flatten = dict_img(:, :)';
 train_num_list = randperm(size(dict_img, 1), dict_set_num);
@@ -25,7 +26,7 @@ target_pt_set = target_pts(test_num_list);
 %% Record
 IOU_res = zeros(test_set_num, lambda_num);
 %% main loop
-for i=1:test_set_num
+parfor i=1:test_set_num
     clean_img = clean_set{i};
     clean_img_flatten = clean_img(:);
     target_img = target_set{i};
@@ -56,20 +57,18 @@ for i=1:test_set_num
     %-----------------------------------
     lambda_max = max(B' * A);
     w_pan = zeros(size(A, 2), lambda_num);
-    %-----------------------------------
-%     [w_lasso, lasso_res] = lasso(A, B, 'NumLambda', lambda_num+1);
-    %-----------------------------------
+    %-------------lasso-----------------
+    [w_lasso, lasso_res] = lasso(A, B, 'NumLambda', lambda_num+1);
+    %-------------lasso-----------------
     lambda = lambda_max * lambda_ratios;
     for ratio = 1:lambda_num
         fprintf('Pan Test ratio %d/%d, img %d/%d\n', ...
                        ratio, lambda_num, i, test_set_num);
+        %------------PanWei-----------------
         MAXITER = 100;
         [~, end_iter_pan_re, w_screen] = pan_revised(B, A, lambda(ratio), MAXITER);
         w_pan(:, ratio) = w_screen(:, end);
-        %-----------------------------------
-        [end_iter_pan, w_pan_iter] =  pan(B(:, i), A, lambda(ratio), MAXITER);
-        w_pan(:, ratio) = w_pan_iter(:, end);
-        %-----------------------------------
+        %------------lasso------------------
 %         w_pan(:, ratio) = w_lasso(:, ratio);
         %-----------------------------------
         % Detection
@@ -79,11 +78,28 @@ for i=1:test_set_num
             mkdir(output_file);
         end
         % detection result
-        result_pt = dict_pt_set(abs(w_pan(:, ratio)) > 1e-6, :);
+        result_pt = dict_pt_set(abs(w_pan(:, ratio)) > (0.1*max(w_pan(:, ratio))), :);
+        %% NMS
+        x = result_pt(:, 1);
+        y = result_pt(:, 2);
+        w = result_pt(:, 3);
+        h = result_pt(:, 3);
+        nms_bbox = zeros(size(result_pt, 1), 5);
+        nms_bbox(:, 1) = x-w/2+0.5;
+        nms_bbox(:, 2) = y-h/2+0.5;
+        nms_bbox(:, 3) = x+w/2+0.5;
+        nms_bbox(:, 4) = y+h/2+0.5;
+        nms_bbox(:, 5) = w_pan(abs(w_pan(:, ratio)) > (0.1*max(w_pan(:, ratio))), ratio);
+        top_bbox = nms(nms_bbox, nms_overlap);
+        result_pt_nms = zeros(size(top_bbox, 1), 3);
+        result_pt_nms(:, 1) = (top_bbox(:, 1) + top_bbox(:, 3) - 1) ./ 2;
+        result_pt_nms(:, 2) = (top_bbox(:, 2) + top_bbox(:, 4) - 1) ./ 2;
+        result_pt_nms(:, 3) = top_bbox(:, 3) - top_bbox(:, 1);
+        %% draw
         draw_bbox([output_file '/' num2str(ratio) '.png'], ...
-                       target_img_norm, target_pt(:, 2:end), result_pt, 10);
+                       target_img_norm, target_pt(:, 2:end), result_pt_nms, 10);
         draw_bbox([output_file '/' num2str(ratio) '_c.png'], ...
-                       clean_img_norm, target_pt(:, 2:end), result_pt, 10);
+                       clean_img_norm, target_pt(:, 2:end), result_pt_nms, 10);
         % detection iou
         bboxA = zeros(size(result_pt, 1), 4);
         bboxA(:, 1) = result_pt(:, 1) - result_pt(:, 3) ./ 2 + 0.5;
@@ -106,8 +122,8 @@ end
 h_fig = figure('Name', 'IOU', 'Visible', 'off');
 IOU_acc_mean = mean(IOU_res, 1);
 IOU_acc_std = std(IOU_res, 1, 1);
-errorbar(lambda_ratios, IOU_acc_mean, IOU_acc_std, '-s', 'LineWidth', 2, 'Color', 'g', ...
-                  'MarkerSize',10, 'MarkerEdgeColor','g','MarkerFaceColor','w')
+errorbar(lambda_ratios, IOU_acc_mean, IOU_acc_std, '-s', 'LineWidth', 2, 'Color', 'black', ...
+                  'MarkerSize',10, 'MarkerEdgeColor','r','MarkerFaceColor','w')
 
 title('IOU -- \lambda / \lambda_{max}')
 xlabel('\lambda / \lambda_{max}')
