@@ -7,11 +7,11 @@ if exist(detection_file, 'dir') ~= 0
 end
 %% prepare dataset
 [dict_img, dict_pt, target_imgs, clean_imgs, target_pts] = load_data('./data');
-dict_set_num = 1000;
-test_set_num = 10;
+dict_set_num = 5000;
+test_set_num = 20;
 lambda_num = 10;
-lambda_ratios = linspace(0.01, 0.3, lambda_num);
-nms_overlap = 0.5;
+lambda_ratios = linspace(0.001, 0.03, lambda_num);
+nms_overlap = 0.6;
 %-----------------------------------
 dict_img_flatten = dict_img(:, :)';
 train_num_list = randperm(size(dict_img, 1), dict_set_num);
@@ -98,8 +98,6 @@ parfor i=1:test_set_num
         %% draw
         draw_bbox([output_file '/' num2str(ratio) '.png'], ...
                        target_img_norm, target_pt(:, 2:end), result_pt_nms, 10);
-        draw_bbox([output_file '/' num2str(ratio) '_c.png'], ...
-                       clean_img_norm, target_pt(:, 2:end), result_pt_nms, 10);
         % detection iou
         bboxA = zeros(size(result_pt, 1), 4);
         bboxA(:, 1) = result_pt(:, 1) - result_pt(:, 3) ./ 2 + 0.5;

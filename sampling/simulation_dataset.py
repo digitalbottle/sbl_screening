@@ -12,13 +12,13 @@ from normalize import std_Normalize, l2_Normalize
 from skimage.io import imread
 from skimage.io import imsave
 
-noise_sigma = 0.1
+noise_sigma = 0.15
 pic_size = [28, 28]
 def point_number():
-  n = np.random.randint(2, 5)
+  n = np.random.randint(3, 5)
   return n
 target_size = 200
-dict_size = 3000
+dict_size = 5000
 
 
 
@@ -45,7 +45,7 @@ def prior_transform_2d_dict(uniform_sample):
   priors_list = [priors.TopHat(mini=0.8, maxi=1.2),
                  priors.TopHat(mini=pic_size[0]*0.1, maxi=pic_size[0]*0.9), 
                  priors.TopHat(mini=pic_size[1]*0.1, maxi=pic_size[1]*0.9),
-                 priors.TopHat(mini=2, maxi=4)]
+                 priors.TopHat(mini=1.9, maxi=2.1)]
   if len(uniform_sample) != (len(priors_list)):
     print(len(uniform_sample), len(priors_list))
     raise Exception("theta length not equal to priors number")
@@ -66,7 +66,7 @@ def prior_transform_2d_target(uniform_sample):
   priors_list = [priors.TopHat(mini=0.8, maxi=1.2),
                  priors.TopHat(mini=pic_size[0]*0.2, maxi=pic_size[0]*0.8), 
                  priors.TopHat(mini=pic_size[1]*0.2, maxi=pic_size[1]*0.8),
-                 priors.TopHat(mini=2, maxi=4)]
+                 priors.TopHat(mini=1.9, maxi=2.1)]
   if len(uniform_sample) != (len(priors_list)):
     print(len(uniform_sample), len(priors_list))
     raise Exception("theta length not equal to priors number")
