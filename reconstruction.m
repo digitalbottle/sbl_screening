@@ -1,5 +1,5 @@
 clc;clear;
-addpath('dict_learning', 'MSSIM_PSNR')
+addpath('dict_learning', 'MSSIM_PSNR', 'utils')
 denoise_file = './data/result/reconstruction/denoise/';
 Wavelet_file = './data/result/reconstruction/Wavelet/';
 if exist(denoise_file, 'dir') ~= 0

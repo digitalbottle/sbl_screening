@@ -1,4 +1,5 @@
 clc;clear;
+addpath('dict_learning', 'utils')
 output_file = './data/result/';
 if exist(output_file,'dir') == 0
     mkdir(output_file);

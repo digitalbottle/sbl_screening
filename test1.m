@@ -1,6 +1,7 @@
 clc;clear;
+addpath('dict_learning', 'utils')
 %% prepare dataset
-[dict_img, dict_pt, target_img, target_pts] = load_data('./data');
+[dict_img, dict_pt, target_img, clean_img, target_pts] = load_data('./data');
 for i=1:length(target_img)
     temp = target_img{i};
     target_img{i} = temp(:);

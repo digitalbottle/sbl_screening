@@ -14,7 +14,10 @@ from skimage.io import imsave
 
 
 pic_size = [28, 28]
-point_number = 4
+def point_number():
+  np.random.randint(3, 6)
+  return n
+pdb.set_trace()
 target_size = 200
 dict_size = 3000
 def point_spread_function_2d(p, meshgrid):
@@ -138,7 +141,7 @@ if __name__ == '__main__':
                                   prior_transform=prior_transform_2d_target,
                                   noise_sigma=0.5,
                                   background=0.01,
-                                  point_num=point_number)
+                                  point_num=point_number())
     # No noise
     target_list = I_3d.copy()
     target_h5["targets_clean_%02d"%i] = np.asarray(target_list)
