@@ -15,9 +15,8 @@ from skimage.io import imsave
 
 pic_size = [28, 28]
 def point_number():
-  np.random.randint(3, 6)
+  n = np.random.randint(2, 5)
   return n
-pdb.set_trace()
 target_size = 200
 dict_size = 3000
 def point_spread_function_2d(p, meshgrid):
@@ -130,7 +129,9 @@ if __name__ == '__main__':
   dict_h5.close()
   ''' Target '''
   target_file = "../data/simulate_target/"
+  clean_file = "../data/simulate_clean/"
   safe_mkdir(target_file)
+  safe_mkdir(clean_file)
   target_list = []
   target_h5 = h5py.File(os.path.join(target_file, "../target.h5"), 'w')
   target_h5["target_num"] = target_size
@@ -145,6 +146,9 @@ if __name__ == '__main__':
     # No noise
     target_list = I_3d.copy()
     target_h5["targets_clean_%02d"%i] = np.asarray(target_list)
+    img = std_Normalize(I_3d) * 255
+    img = img.astype(np.uint8)
+    imsave(os.path.join(clean_file, "%05d.tif"%i), img.transpose(1, 0))
     # Noise
     target_list = I_3d_noise.copy()
     target_h5["targets_noise_%02d"%i] = np.asarray(target_list)
@@ -152,6 +156,7 @@ if __name__ == '__main__':
     img = std_Normalize(I_3d_noise) * 255
     img = img.astype(np.uint8)
     imsave(os.path.join(target_file, "%05d.tif"%i), img.transpose(1, 0))
+    print(os.path.join(clean_file, "%05d.tif"%i))
     print(os.path.join(target_file, "%05d.tif"%i))
   target_h5.close()
 
