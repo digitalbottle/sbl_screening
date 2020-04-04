@@ -8,9 +8,9 @@ end
 %% prepare dataset
 [dict_img, dict_pt, target_imgs, clean_imgs, target_pts] = load_data('./data');
 dict_set_num = 1000;
-test_set_num = 1;
+test_set_num = 10;
 lambda_num = 10;
-lambda_ratios = linspace(0.1, 0.99, lambda_num);
+lambda_ratios = linspace(0.0, 1.0, lambda_num);
 %-----------------------------------
 dict_img_flatten = dict_img(:, :)';
 train_num_list = randperm(size(dict_img, 1), dict_set_num);
@@ -57,20 +57,20 @@ for i=1:test_set_num
     lambda_max = max(B' * A);
     w_pan = zeros(size(A, 2), lambda_num);
     %-----------------------------------
-    [w_lasso, lasso_res] = lasso(A, B, 'NumLambda', lambda_num+1);
+%     [w_lasso, lasso_res] = lasso(A, B, 'NumLambda', lambda_num+1);
     %-----------------------------------
     lambda = lambda_max * lambda_ratios;
     for ratio = 1:lambda_num
         fprintf('Pan Test ratio %d/%d, img %d/%d\n', ...
                        ratio, lambda_num, i, test_set_num);
-        % MAXITER = 100;
-        % [~, end_iter_pan_re, w_screen] = pan_revised(B, A, lambda(ratio), MAXITER);
-        % w_pan(:, ratio) = w_screen(:, end);
+        MAXITER = 100;
+        [~, end_iter_pan_re, w_screen] = pan_revised(B, A, lambda(ratio), MAXITER);
+        w_pan(:, ratio) = w_screen(:, end);
         %-----------------------------------
-        % [end_iter_pan, w_pan_iter] =  pan(B(:, i), A, lambda(ratio), MAXITER);
-        % w_pan(:, ratio) = w_pan_iter(:, end);
+        [end_iter_pan, w_pan_iter] =  pan(B(:, i), A, lambda(ratio), MAXITER);
+        w_pan(:, ratio) = w_pan_iter(:, end);
         %-----------------------------------
-        w_pan(:, ratio) = w_lasso(:, ratio);
+%         w_pan(:, ratio) = w_lasso(:, ratio);
         %-----------------------------------
         % Detection
         %-----------------------------------
@@ -96,6 +96,22 @@ for i=1:test_set_num
         bboxB(:, 2) = target_pt(:, 3) - target_pt(:, 4) ./ 2 + 0.5;
         bboxB(:, 3) = target_pt(:, 4);
         bboxB(:, 4) = target_pt(:, 4);
-        IOU_res(i, ratio) = bboxOverlapRatio(bboxA,bboxB);
+        if size(bboxA, 1) > size(bboxB, 1)
+            IOU_res(i, ratio) = mean(max(bboxOverlapRatio(bboxA,bboxB), [], 2));
+        else
+            IOU_res(i, ratio) = mean(max(bboxOverlapRatio(bboxA,bboxB), [], 1));
+        end  
     end
 end
+h_fig = figure('Name', 'IOU', 'Visible', 'off');
+IOU_acc_mean = mean(IOU_res, 1);
+IOU_acc_std = std(IOU_res, 1, 1);
+errorbar(lambda_ratios, IOU_acc_mean, IOU_acc_std, '-s', 'LineWidth', 2, 'Color', 'g', ...
+                  'MarkerSize',10, 'MarkerEdgeColor','g','MarkerFaceColor','w')
+
+title('IOU -- \lambda / \lambda_{max}')
+xlabel('\lambda / \lambda_{max}')
+ylabel('mean-IOU')
+% legend('Lasso', 'Pan Wei Screen Test');
+saveas(h_fig, [detection_file 'IOU.png']);
+close(h_fig)
