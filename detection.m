@@ -9,8 +9,8 @@ end
 [dict_img, dict_pt, target_imgs, clean_imgs, target_pts] = load_data('./data');
 dict_set_num = 5000;
 test_set_num = 20;
-lambda_num = 10;
-lambda_ratios = linspace(0.001, 0.03, lambda_num);
+lambda_num = 20;
+lambda_ratios = linspace(0.001, 0.09, lambda_num);
 nms_overlap = 0.6;
 %-----------------------------------
 dict_img_flatten = dict_img(:, :)';
