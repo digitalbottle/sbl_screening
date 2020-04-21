@@ -1,6 +1,7 @@
 clc;clear;
 addpath('dict_learning', 'utils')
 output_file = './data/result/';
+addpath('dict_learning', 'utils', 'mnist')
 if exist(output_file,'dir') == 0
     mkdir(output_file);
 end
@@ -11,8 +12,8 @@ test_image_base = loadMNISTImages('./data/mnist/t10k-images-idx3-ubyte');
 test_label_base = loadMNISTLabels('./data/mnist/t10k-labels-idx1-ubyte');
 %------------------------
 dict_set_num = 1000;
-test_set_num = 10;
-lambda_num = 10;
+test_set_num = 3;
+lambda_num = 12;
 lambda_ratios = linspace(0.1, 0.9, lambda_num);
 %------------------------
 train_num_list = randperm(size(train_image_base, 2), dict_set_num);
